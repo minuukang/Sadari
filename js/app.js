@@ -12,6 +12,8 @@
 		var startItems;// = appStartData.querySelectorAll(".result-data");
 		var endItems;// = appEndData.querySelectorAll(".result-data");
 
+		var appCanvas;
+
 		function getStartHtmlItems () {
 			if (!startItems) {
 				startItems = appStartData.querySelectorAll(".result-data");
@@ -24,8 +26,6 @@
 			}
 			return endItems;
 		}
-
-
 
 		appEndData.addEventListener("click", (e) => {
 			e.preventDefault();
@@ -76,48 +76,52 @@
 			if (hideMiddle) {
 				canvas.parentNode.classList.add("__active");
 			}
-			var ySize = 30;
-			var width = canvas.width = window.innerWidth;
-			var height = canvas.height = (app.stack + 1) * ySize;
-			var part = width / app.getSize();
+			appCanvas = new SimpleCanvas(canvas);
+			appCanvas.setData("ySize", 30);
+			appCanvas.setWidth(window.innerWidth);
+			appCanvas.setHeight((app.stack + 1) * appCanvas.getData("ySize"));
+			appCanvas.setData("part", function (self) {
+				return self.getWidth() / app.getSize();
+			});
 
-			var ctx = canvas.getContext("2d");
 			function drawBackground () {
-				ctx.clearRect(0, 0, width, height);
-				ctx.strokeStyle = "#ddd";
-				ctx.lineWidth = 20;
-				ctx.lineCap = "square";
+				appCanvas.clearAll();
+				appCanvas.setOption("strokeStyle", "#ddd");
+				appCanvas.setOption("lineWidth", 20);
+				appCanvas.setOption("lineCap", "square");
+
+				var partHalf = appCanvas.getData("part") / 2;
 
 				for (var i = 0, len = app.getSize(); i < len; i ++) {
-					ctx.beginPath();
-					ctx.moveTo((i * part) + (part / 2), 0);
-					ctx.lineTo((i * part) + (part / 2), height);
-					ctx.stroke();
-					ctx.closePath();
+					var x = (i * appCanvas.getData("part")) + partHalf;
+					appCanvas.drawLine([x, 0], [x, appCanvas.getHeight()]);
 				}
+
 				for (var i = 0, len = app.lines.length; i < len; i ++) {
 					var lineData = app.lines[i];
 					for (var j = 0, jlen = lineData.length; j < jlen; j ++) {
 						if (lineData[j] === 1) {
-							ctx.beginPath();
-							ctx.moveTo((i * part) + (part / 2), ySize * (j + 1));
-							ctx.lineTo(((i + 1) * part) + (part / 2), ySize * (j + 1));
-							ctx.stroke();
-							ctx.closePath();
+							var y = appCanvas.getData("ySize") * (j + 1);
+							appCanvas.drawLine(
+								[(i * appCanvas.getData("part")) + partHalf, y],
+								[((i + 1) * appCanvas.getData("part")) + partHalf, y]
+							);
 						}
 					}
 				}
-
-				ctx.lineWidth = 10;
+				appCanvas.setOption("lineWidth", 10);
 			}
 			// 하나만 움직여볼까
 			drawBackground();
 			var activeIndex = 0;
-
 			var startItems = getStartHtmlItems();
 			var endItems = getEndHtmlItems();
 
+			var animation = new AnimationController;
+
 			drawActiveAnimation(activeIndex, function nextAnimation () {
+				animation.clear();
+
 				var moveData = app.move(activeIndex).pop();
 				//console.log(moveData);
 				if (endItems[moveData[0]].classList.contains("__active")) {
@@ -135,12 +139,11 @@
 			});
 
 			function drawLineFromMoveData (data, prevX, progress) {
-				var x = data[0],
-						y = data[1],
-						value = data[2];
-				progress = progress || 1;
+				var [x, y, value] = data;
+				var halfPart = appCanvas.getData("part") / 2;
+				progress = typeof progress === "undefined" ? 1 : progress;
 				if (value === 0) {
-					var startX = (x * appCanvas.getData("part"));
+					var startX = (x * appCanvas.getData("part")) + halfPart;
 					var startY = y === 0 ? 0 : ((y - 1) * appCanvas.getData("ySize"));
 					appCanvas.drawLine(
 						[startX, startY],
@@ -148,81 +151,30 @@
 					);
 				} else {
 					var direction = prevX > x ? -1 : 1;
-					var startX = (prevX * appCanvas.getData("part")) + (appCanvas.getData("part") / 2);
+					var startX = (prevX * appCanvas.getData("part")) + halfPart;
 					var startY = y * appCanvas.getData("ySize");
 					appCanvas.drawLine(
 						[startX, startY],
-						[startX + (progress * part * direction), startY]
+						[startX + (progress * appCanvas.getData("part") * direction), startY]
 					);
 				}
 			}
 
-
 			function drawActiveAnimation (index, callback) {
 				var moveData = app.move(index);
-				var animationStack = [];
-				ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
+				//var animationStack = [];
+				//ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
+				appCanvas.setOption("strokeStyle", generateRandomColor([125, 55], [125, 55], [125, 55]));
 				for (var i = 0, len = moveData.length; i < len; i ++) {
-					!function () {
-						var data = moveData[i],
-								x = data[0],
-								y = data[1],
-								value = data[2];
-						// 가로인가 세로인가
-						if (value === 0) { // 세로
-							animationStack.push(function (progress) {
-								//drawBackground();
-								ctx.beginPath();
-								if (y === 0) {
-									ctx.moveTo((x * part) + (part / 2), 0);
-									ctx.lineTo((x * part) + (part / 2), (progress * ySize));
-								} else {
-									ctx.moveTo((x * part) + (part / 2), ((y - 1) * (ySize)));
-									ctx.lineTo((x * part) + (part / 2), (((y - 1)) * (ySize)) + (ySize * progress));
-								}
-								ctx.stroke();
-								ctx.closePath();
-							});
-						} else { // 가로
-							var prevData = moveData[i - 1];
-							var direction = prevData[0] > x ? -1 : 1;
-							animationStack.push(function (progress) {
-								//drawBackground();
-								ctx.beginPath();
-								ctx.moveTo((prevData[0] * part) + (part / 2), ((y) * (ySize)));
-								ctx.lineTo((prevData[0] * part) + (part / 2) + (progress * part * direction), ((y) * (ySize)));
-								ctx.stroke();
-								ctx.closePath();
-							});
-						}
-					}();
+					animation.push((function () {
+						var prevData = moveData[i - 1];
+						var data = moveData[i];
+						return function (progress) {
+							drawLineFromMoveData(data, prevData ? prevData[0] : -1, progress);
+						};
+					})());
 				}
-				asyncCall(animationStack, callback);
-			}
-
-			function asyncCall (stack, end) {
-				var index = 0;
-				function calling () {
-					var starttime;
-					requestAnimationFrame(function animationFrame (timestamp) {
-						if (!starttime) {
-							starttime = timestamp;
-						}
-						var progress = (timestamp - starttime) / 100;
-						stack[index](progress > 1 ? 1 : progress);
-						if (progress < 1) {
-							requestAnimationFrame(animationFrame);
-						} else {
-							++index;
-							if (index === stack.length) {
-								end && end();
-							} else {
-								calling();
-							}
-						}
-					});
-				}
-				calling();
+				animation.start(callback);
 			}
 		}
 

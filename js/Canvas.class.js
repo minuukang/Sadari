@@ -42,6 +42,10 @@
 			return this.canvas.height;
 		}
 
+		clearAll () {
+			this.ctx.clearRect(0, 0, this.getWidth(), this.getHeight());
+		}
+
 	}
 
 	window.SimpleCanvas = SimpleCanvas;
