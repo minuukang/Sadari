@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>사다리타기</title>
+	<link rel="stylesheet" href="common.css">
+	<link rel="stylesheet" href="app.css">
+</head>
+<body>
+	<div id="app">
+		<form method="post" id="app-intro" class="container app-page __active">
+			<h1>사다리타기</h1>
+			<div class="form-group">
+				<label for="start-data" class="form-label">대상</label>
+				<input class="form-input" placeholder="대상을 입력해주세요" type="text" id="start-data" required>
+			</div>
+			<div class="form-group">
+				<label for="end-data" class="form-label">결과</label>
+				<input class="form-input" placeholder="결과를 입력해주세요" type="text" id="end-data" required>
+			</div>
+			<div class="form-group">
+				<label class="form-switch">
+            <input type="checkbox" id="hide-middle" checked />
+            <i class="form-icon"></i> 가리개 사용
+        </label>
+			</div>
+			<p class="toast">모든 데이터는 <span class="highlight">,</span> 로 구분하실 수 있습니다.</p>
+			<footer class="app-form-footer">
+				<button type="submit" class="btn btn-lg">결과 확인</button>
+			</footer>
+		</form>
+		<div id="app-result" class="app-page">
+			<h2>사다리가 내려간당</h2>
+			<div id="sadari-start-data" class="result-row"></div>
+			<div class="result-line-wrapper">
+				<canvas id="sadari-line" class="result-line"></canvas>
+			</div>
+			<div id="sadari-end-data" class="result-row"></div>
+			<footer class="app-form-footer  ">
+				<div class="btn-group">
+					<button type="submit" class="btn btn-primary btn-lg">전체결과 바로보기</button>
+					<button type="submit" class="btn btn-lg">답안바로보기</button>
+					<button type="submit" class="btn btn-lg">재시작</button>
+				</div>
+			</footer>
+		</div>
+	</div>
+
+	<script src="js/colorGenerator.js"></script>
+	<script src="js/Canvas.class.js"></script>
+	<script src="js/Sadari.class.js"></script>
+	<script src="js/app.js"></script>
+</body>
+</html>
