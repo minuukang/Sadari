@@ -20,12 +20,16 @@
 			this.ctx[name] = value;
 		}
 
-		drawLine (coor1, coor2) {
+		drawLine ([x1, y1], [x2, y2]) {
 			this.ctx.beginPath();
-			this.ctx.moveTo(coor1[0], coor1[1]);
-			this.ctx.lineTo(coor2[0], coor2[1]);
+			this.ctx.moveTo(x1, y1);
+			this.ctx.lineTo(x2, y2);
 			this.ctx.stroke();
 			this.ctx.closePath();
+		}
+
+		drawBox ([x1, y1], [x2, y2]) {
+			//this.ctx.fillRect(x1, y1, x2 - );
 		}
 
 		setWidth (w) {

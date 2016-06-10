@@ -12,6 +12,28 @@
 			this.lineCanvas = document.querySelector("#sadari-line");
 			this.startItems = [];// = appStartData.querySelectorAll(".result-data");
 			this.endItems = [];// = appEndData.querySelectorAll(".result-data");
+			// buttons
+			this.showResultDirectBtn = document.querySelector("#show-result-direct");
+			this.hiderToggleBtn = document.querySelector("#hider-toggle");
+			this.appResetBtn = document.querySelector("#app-reset");
+		}
+		/*
+		 * 결과 바로 보여주기 버튼 가져오기
+		 */
+		getShowResultDirectBtn () {
+			return this.showResultDirectBtn;
+		}
+		/*
+		 * 가리개 토글 버튼 가져오기
+		 */
+		getHiderToggleBtn () {
+			return this.hiderToggleBtn;
+		}
+		/*
+		 * 앱 리셋 버튼 가져오기
+		 */
+		getAppResetBtn () {
+			return this.appResetBtn;
 		}
 		/*
 		 * 사다리 초기섫정 폼 가져오기
@@ -47,7 +69,7 @@
 				html += "<div class=\"result-data\"><em class=\"result-data-value\">"+value+"</em></div>";
 			});
 			this.appStartData.innerHTML = html;
-			this.startItems = this.appStartData.querySelectorAll(".result-data");
+			this.startItems = this.appStartData.querySelectorAll(".result-data-value");
 		}
 		/*
 		 * 사다리 끝데이터 그리기
@@ -56,10 +78,10 @@
 			this.endItems = [];
 			var html = "";
 			data.forEach(function (value, index) {
-				html += "<div class=\"result-data"+(value === null ? "" : " __active")+"\"><em class=\"result-data-value\">"+(value || "X")+"</em></div>";
+				html += "<div class=\"result-data\"><em class=\"result-data-value"+(value === null ? "" : " __active")+"\">"+(value || "X")+"</em></div>";
 			});
 			this.appEndData.innerHTML = html;
-			this.endItems = this.appEndData.querySelectorAll(".result-data");
+			this.endItems = this.appEndData.querySelectorAll(".result-data-value");
 		}
 		/*
 		 * 사다리 시작 아이템 DOM요소
@@ -88,16 +110,33 @@
 			this.appResult.classList.add("__active");
 		}
 		/*
+		 * 가리개 토글
+		 */
+		toggleResultHider () {
+			let stateless = Number(this.hiderToggleBtn.getAttribute("data-stateless"));
+			if (stateless === 1) {
+				this.hideResultHider();
+			} else {
+				this.showResultHider();
+			}
+		}
+		/*
 		 * 가리개 보이기
 		 */
 		showResultHider () {
-			this.lineCanvas.parentNode.classList.add("__active");
+			this.appResult.classList.add("__hider");
+			const stateMessage = JSON.parse(this.hiderToggleBtn.getAttribute("data-stateless-msg"));
+			this.hiderToggleBtn.innerHTML = stateMessage[1];
+			this.hiderToggleBtn.setAttribute("data-stateless", 1);
 		}
 		/*
 		 * 가리개 가리기
 		 */
 		hideResultHider () {
-			this.lineCanvas.parentNode.classList.remove("__active");
+			this.appResult.classList.remove("__hider");
+			const stateMessage = JSON.parse(this.hiderToggleBtn.getAttribute("data-stateless-msg"));
+			this.hiderToggleBtn.innerHTML = stateMessage[0];
+			this.hiderToggleBtn.setAttribute("data-stateless", 0);
 		}
 	}
 

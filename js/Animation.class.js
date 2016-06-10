@@ -28,7 +28,7 @@
 					if (!starttime) {
 						starttime = timestamp;
 					}
-					let progress = (timestamp - starttime) / 100;
+					let progress = (timestamp - starttime) / 50;
 					this.pushStack[index](progress > 1 ? 1 : progress);
 					if (progress < 1) {
 						this.timer = requestAnimationFrame(animationFrame);

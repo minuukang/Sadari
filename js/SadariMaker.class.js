@@ -6,12 +6,13 @@
 			this.appSadari = appSadari;
 			this.appView = appView;
 			this.aniCtrl = new AnimationController;
+			this.colorStorage = new ColorStorage;
 			this.reset();
 		}
 		reset () {
 			this.aniCtrl.clear();
 			this.moveData = [];
-			this.colorStorage = [];
+			this.colorStorage.reset();
 		}
 		chainMoveData (moveData) {
 			let activeIndex = this.moveData.length;
@@ -19,10 +20,12 @@
 			let [lastIndex] = moveData[moveData.length - 1];
 			const startItems = this.appView.getStartData();
 			const endItems = this.appView.getEndData();
+			/*
 			console.log(lastIndex);
 			if (endItems[lastIndex].classList.contains("__active")) {
 				startItems[activeIndex].classList.add("__active");
 			}
+			*/
 			startItems[activeIndex].infoData = endItems[lastIndex].infoData = {
 				endIndex: lastIndex,
 				startIndex: activeIndex
@@ -38,13 +41,17 @@
 			});
 			this.drawBackground();
 		}
-		startDirect () {
+		showDirect () {
 			this.startInitialize();
-			this.appSadari.execute().forEach((moveData, index, allData) => {
-				let prevData = index && allData[index - 1];
-				this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
-				this.appCanvas.setOption("strokeStyle", this.getColor(index));
-				this.drawLineFromMoveData(moveData, prevData ? prevData[0] : -1, 1);
+			this.appSadari.execute().forEach((moveData, index) => {
+				//let prevData = index && allData[index - 1];
+				//this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
+				//this.appCanvas.setOption("strokeStyle", this.getColor(index));
+				const color = this.colorStorage.create([125, 55], [75, 105], [55, 155]);
+				this.appCanvas.setOption("strokeStyle", color.toString());
+				moveData.forEach((data, index, allData) => {
+					this.drawLineFromMoveData(data, index ? allData[index - 1][0] : -1, 1);
+				});
 				this.chainMoveData(moveData);
 			});
 		}
@@ -74,8 +81,9 @@
 			const moveData = this.moveData[index];
 			//var animationStack = [];
 			//ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
-			this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
-			this.appCanvas.setOption("strokeStyle", this.getColor(index));
+			//this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
+			const color = this.colorStorage.create([125, 55], [75, 105], [55, 155]);
+			this.appCanvas.setOption("strokeStyle", color.toString());
 			for (let i = 0, len = moveData.length; i < len; i ++) {
 				this.aniCtrl.push((() => {
 					let prevData = moveData[i - 1];
@@ -134,18 +142,6 @@
 				}
 			}
 			this.appCanvas.setOption("lineWidth", 10);
-		}
-		/*
-		 * Set Color
-		 */
-		setColor (index, colorObject) {
-			this.colorStorage[index] = colorObject;
-		}
-		/*
-		 * get Color
-		 */
-		getColor (index) {
-			return this.colorStorage[index];
 		}
 	}
 

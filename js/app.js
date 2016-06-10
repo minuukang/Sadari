@@ -44,7 +44,7 @@
 
 		const badgeColorMatch = (event) => {
 			const target = event.target;
-			if (target.classList.contains("result-data")) {
+			if (target.classList.contains("result-data-value")) {
 				if (target.infoData) {
 					const startItems = sadariView.getStartData();
 					const endItems = sadariView.getEndData();
@@ -54,7 +54,7 @@
 					switch (event.type) {
 						case "mouseover":
 							startData.style.backgroundColor =
-							endData.style.backgroundColor = String(sadariMaker.getColor(target.infoData.startIndex));
+							endData.style.backgroundColor = String(sadariMaker.colorStorage.get(target.infoData.startIndex));
 							startData.classList.add("__hover");
 							endData.classList.add("__hover");
 							break;
@@ -70,6 +70,23 @@
 
 		sadariView.getResult().addEventListener("mouseover", badgeColorMatch);
 		sadariView.getResult().addEventListener("mouseout", badgeColorMatch);
+
+		sadariView.getShowResultDirectBtn().addEventListener("click", (e) => {
+			e.preventDefault();
+			sadariMaker.showDirect();
+		});
+
+		sadariView.getHiderToggleBtn().addEventListener("click", (e) => {
+			e.preventDefault();
+			sadariView.toggleResultHider();
+		});
+
+		sadariView.getAppResetBtn().addEventListener("click", (e) => {
+			//sadariView.getForm().reset();
+			e.preventDefault();
+			sadariView.introPageOpen();
+			sadariMaker.reset();
+		});
 
 		/*
 		var appIntroForm = document.querySelector("#app-intro");

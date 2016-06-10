@@ -23,51 +23,50 @@
 		return "rgb("+this.join(",")+")";
 	};
 
-	var colorStorage = {
-		_data: [],
-		push: function (g) {
-			this._data.push(g);
-		},
-		reset: function () {
-			this._data.length = 0;
-		},
-		get: function (index) {
-			return this._data[index];
-		},
-		approach: function (g) {
-			for (var i = 0, len = this._data.length; i < len; i ++) {
+	class ColorStorage {
+		constructor () {
+			this.data = [];
+		}
+		create (n1, n2, n3) {
+			var g = null, max = 100000;
+			do {
+				g = new ColorGenerator(n1, n2, n3);
+				if ( ! this.approach(g)) {
+					break;
+				} else {
+					g = null;
+				}
+			} while(--max);
+			if (g === null) {
+				//console.log(colorStorage);
+				throw new Error("더 이상 조합할 컬러가 없습니다.");
+			}
+			this.data.push(g);
+			return g;
+		}
+		approach (g) {
+			for (var i = 0, len = this.data.length; i < len; i ++) {
 				var count = 0;
 				for (var j = 0; j < 3; j ++) {
-					if (this._data[i][j] - 15 <= g[j] && g[j] <= this._data[i][j] + 15) {
+					if (this.data[i][j] - 30 <= g[j] && g[j] <= this.data[i][j] + 30) {
 						count ++;
 					}
 				}
-				// 이전 컬러는 2개도 안됨
-				if (count >= 2) {
+				if (count > 2) {
 					return true;
 				}
 			}
 			return false;
 		}
-	};
-	//window.colorStorage = colorStorage;
-	window.generateRandomColor = function (n1, n2, n3) {
-		var g = null, max = 10000;
-		do {
-			g = new ColorGenerator(n1, n2, n3);
-			if ( ! colorStorage.approach(g)) {
-				break;
-			} else {
-				g = null;
-			}
-		} while(--max);
-		if (g === null) {
-			console.log(colorStorage);
-			throw new Error();
+		get (index) {
+			return this.data[index];
 		}
-		colorStorage.push(g);
-		return g.toString();
-	};
+		reset () {
+			this.data.length = 0;
+		}
+	}
+
+	window.ColorStorage = ColorStorage;
 
 
 }();

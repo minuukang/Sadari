@@ -58,7 +58,7 @@
 				return .5 - Math.random();
 			});
 			// 단계 설정
-			this.stack = 15;
+			this.stack = 8;
 			this.reset();
 		}
 		getSize () {
