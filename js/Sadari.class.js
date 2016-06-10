@@ -23,11 +23,11 @@
 	/*
 	 * 랜덤 숫자가 구성되어 있는 배열을 반환
 	 */
-	function getRandomArray (max, size, min) {
+	function getRandomArray (min, max, range) {
 		var r = [];
-		for (var i = min + getRandomNumber(min) - 1; i --;) {
+		for (var i = min + getRandomNumber(max - min); i --;) {
 			while (1) {
-				var number = getRandomNumber(max);
+				var number = getRandomNumber(range);
 				if (!~r.indexOf(number)) {
 					r.push(number);
 					break;
@@ -58,7 +58,7 @@
 				return .5 - Math.random();
 			});
 			// 단계 설정
-			this.stack = 10;
+			this.stack = 15;
 			this.reset();
 		}
 		getSize () {
@@ -79,12 +79,14 @@
 		reset () {
 			this.lines = [];
 			// 단계별 스택설정
-			for (var i = 0, len = this.getSize() - 1; i < len; i ++) {
-				while (true) {
-					var newLine = [];
+			let stackHalf = Math.floor(this.stack / 2);
+			for (let i = 0, len = this.getSize() - 1; i < len; i ++) {
+				let maxCount = 10000;
+				while (--maxCount) {
+					let newLine = [];
 					// 랜덤값 도출
-					var randomArray = getRandomArray(this.stack, this.stack, (this.stack - Math.floor(this.stack / 2)));
-					for (var j = 0; j < this.stack; j ++) {
+					let randomArray = getRandomArray(stackHalf - 2, stackHalf, this.stack);
+					for (let j = 0; j < this.stack; j ++) {
 						if (~randomArray.indexOf(j)) {
 							newLine.push(1);
 						} else {
@@ -95,7 +97,9 @@
 						this.lines.push(newLine);
 						break;
 					}
-
+				}
+				if (maxCount < 1) {
+					throw new Error("j_j");
 				}
 			}
 		}

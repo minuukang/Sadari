@@ -76,7 +76,7 @@
 			//ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
 			this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
 			this.appCanvas.setOption("strokeStyle", this.getColor(index));
-			for (var i = 0, len = moveData.length; i < len; i ++) {
+			for (let i = 0, len = moveData.length; i < len; i ++) {
 				this.aniCtrl.push((() => {
 					let prevData = moveData[i - 1];
 					let data = moveData[i];

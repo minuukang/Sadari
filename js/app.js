@@ -6,6 +6,7 @@
 		const sadariCanvas = new SimpleCanvas(sadariView.getCanvas());
 		let sadariApp, sadariMaker;
 
+
 		const openApp = ({startData = [], endData = [], hideMiddle = false, showDirect = false}) => {
 			//try {
 				sadariApp = new Sadari(startData, endData);
