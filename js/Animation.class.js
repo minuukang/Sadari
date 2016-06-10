@@ -21,14 +21,14 @@
 		}
 
 		start ( finishCallback ) {
-			var index = 0;
-			var calling = () => {
-				var starttime;
-				var animationFrame = (timestamp) => {
+			let index = 0;
+			const calling = () => {
+				let starttime;
+				const animationFrame = (timestamp) => {
 					if (!starttime) {
 						starttime = timestamp;
 					}
-					var progress = (timestamp - starttime) / 100;
+					let progress = (timestamp - starttime) / 100;
 					this.pushStack[index](progress > 1 ? 1 : progress);
 					if (progress < 1) {
 						this.timer = requestAnimationFrame(animationFrame);

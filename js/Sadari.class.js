@@ -1,17 +1,28 @@
 !function () {
 
 	"use strict";
+
+	/*
+   * 배열 크기만큼 null로 초기화
+	 */
 	function ArrayInitialize (size) {
-		for (var i = size, r = []; i --;) {
+		for (var i = size, r = new Array(size); i --;) {
 			r[i] = null;
 		}
 		return r;
 	}
 
+	/*
+	 * 랜덤 숫자 값을 반환
+	 */
 	function getRandomNumber (number) {
 		return parseInt(Math.random() * number, 10);
 	}
 
+
+	/*
+	 * 랜덤 숫자가 구성되어 있는 배열을 반환
+	 */
 	function getRandomArray (max, size, min) {
 		var r = [];
 		for (var i = min + getRandomNumber(min) - 1; i --;) {
@@ -30,8 +41,11 @@
 		constructor (startData, endData) {
 			this.startData = startData;
 			this.endData = endData;
-			if (this.startData.length === 0 || this.endData.length === 0) {
+			if (this.endData.length === 0) {
 				throw new Error("빈 데이터는 존재 할 수 없습니다.");
+			}
+			if (this.startData.length < 2) {
+				throw new Error("시작 데이터는 2개 이상 입력하셔야합니다.");
 			}
 			if (this.startData.length < this.endData.length) {
 				throw new Error("종료데이터는 시작데이터보다 많을 수 없습니다.");
@@ -55,6 +69,12 @@
 		}
 		getEndData () {
 			return this.endData;
+		}
+		getLine (index) {
+			return this.lines[index];
+		}
+		getLineSize () {
+			return this.lines.length;
 		}
 		reset () {
 			this.lines = [];

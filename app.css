@@ -18,15 +18,16 @@ body {
   transform: translate(-50%, -50%);
   background-color: #fff;
   padding: 20px;
+	border-radius: 2px;
 }
 #app-intro {
-  padding: 50px 40px;
+  padding: 40px 40px;
 }
 #app-intro h1 {
-  text-align: center;
-  font-size: 40px;
-  font-weight: 900;
+  font-size: 45px;
   color: #313131;
+	margin-top: 0;
+	margin-bottom: 1em;
 }
 #app-intro .form-group {
 	margin-bottom: 30px;

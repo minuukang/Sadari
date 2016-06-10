@@ -21,8 +21,12 @@
 			</div>
 			<div class="form-group">
 				<label class="form-switch">
-            <input type="checkbox" id="hide-middle" checked />
+            <input type="checkbox" id="hide-middle" />
             <i class="form-icon"></i> 가리개 사용
+        </label>
+        <label class="form-switch">
+            <input type="checkbox" id="show-direct" />
+            <i class="form-icon"></i> 결과 바로보이기
         </label>
 			</div>
 			<p class="toast">모든 데이터는 <span class="highlight">,</span> 로 구분하실 수 있습니다.</p>
@@ -40,7 +44,7 @@
 			<footer class="app-form-footer  ">
 				<div class="btn-group">
 					<button type="submit" class="btn btn-primary btn-lg">전체결과 바로보기</button>
-					<button type="submit" class="btn btn-lg">답안바로보기</button>
+					<button type="submit" class="btn btn-lg">결과 가리기</button>
 					<button type="submit" class="btn btn-lg">재시작</button>
 				</div>
 			</footer>
@@ -51,6 +55,8 @@
 	<script src="js/colorGenerator.js"></script>
 	<script src="js/Canvas.class.js"></script>
 	<script src="js/Sadari.class.js"></script>
+	<script src="js/SadariView.class.js"></script>
+	<script src="js/SadariMaker.class.js"></script>
 	<script src="js/app.js"></script>
 </body>
 </html>

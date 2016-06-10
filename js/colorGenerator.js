@@ -31,6 +31,9 @@
 		reset: function () {
 			this._data.length = 0;
 		},
+		get: function (index) {
+			return this._data[index];
+		},
 		approach: function (g) {
 			for (var i = 0, len = this._data.length; i < len; i ++) {
 				var count = 0;
@@ -47,7 +50,7 @@
 			return false;
 		}
 	};
-	window.colorStorage = colorStorage;
+	//window.colorStorage = colorStorage;
 	window.generateRandomColor = function (n1, n2, n3) {
 		var g = null, max = 10000;
 		do {

@@ -1,8 +1,76 @@
-!function () {
-
+!function (window, document) {
 	"use strict";
-
 	document.addEventListener('DOMContentLoaded', () => {
+
+		const sadariView = new SadariView();
+		const sadariCanvas = new SimpleCanvas(sadariView.getCanvas());
+		let sadariApp, sadariMaker;
+
+		const openApp = ({startData = [], endData = [], hideMiddle = false, showDirect = false}) => {
+			//try {
+				sadariApp = new Sadari(startData, endData);
+				sadariMaker = new SadariMaker(sadariApp, sadariCanvas, sadariView);
+				if ( hideMiddle === true ) {
+					sadariView.showResultHider();
+				}
+				sadariView.resultPageOpen();
+				sadariView.createStartData(sadariApp.getStartData());
+				sadariView.createEndData(sadariApp.getEndData());
+				if ( showDirect === true ) {
+					sadariMaker.showDirect();
+				} else {
+					sadariMaker.showAnimation();
+				}
+			//} catch (e) {
+			//	alert(e.message);
+			//	throw e;
+			//}
+		};
+
+		sadariView.getForm().addEventListener("submit", (event) => {
+			event.preventDefault();
+			const startData = sadariView.getInput("#start-data");
+			const endData = sadariView.getInput("#end-data");
+			const hideMiddle = sadariView.getInput("#hide-middle");
+			const showDirect = sadariView.getInput("#show-direct");
+			openApp({
+				startData: startData.value.split(","),
+				endData: endData.value.split(","),
+				hideMiddle: hideMiddle.checked,
+				showDirect: showDirect.checked
+			});
+		});
+
+		const badgeColorMatch = (event) => {
+			const target = event.target;
+			if (target.classList.contains("result-data")) {
+				if (target.infoData) {
+					const startItems = sadariView.getStartData();
+					const endItems = sadariView.getEndData();
+					const startData = startItems[target.infoData.startIndex];
+					const endData = endItems[target.infoData.endIndex];
+
+					switch (event.type) {
+						case "mouseover":
+							startData.style.backgroundColor =
+							endData.style.backgroundColor = String(sadariMaker.getColor(target.infoData.startIndex));
+							startData.classList.add("__hover");
+							endData.classList.add("__hover");
+							break;
+						case "mouseout":
+							startData.style.backgroundColor = endData.style.backgroundColor = "";
+							startData.classList.remove("__hover");
+							endData.classList.remove("__hover");
+							break;
+					}
+				}
+			}
+		};
+
+		sadariView.getResult().addEventListener("mouseover", badgeColorMatch);
+		sadariView.getResult().addEventListener("mouseout", badgeColorMatch);
+
+		/*
 		var appIntroForm = document.querySelector("#app-intro");
 		var appResult = document.querySelector("#app-result");
 
@@ -26,13 +94,6 @@
 			}
 			return endItems;
 		}
-
-		appEndData.addEventListener("click", (e) => {
-			e.preventDefault();
-			if (e.target.nodeName === "BUTTON") {
-				e.target.classList.toggle("__active");
-			}
-		});
 
 		appResult.addEventListener("mouseover", (e) => {
 			if (e.target.classList.contains("result-data")) {
@@ -198,140 +259,7 @@
 			playCanvas(app, hideMiddle);
 
 		}
+		*/
 
 	});
-	// 사람
-	/*
-	var person = ArrayInitialize(18);
-	var result = ["당첨", "당첨","당첨"];
-	var app = new Sadari(person, result);
-	app.stack = 12;
-	app.reset();
-
-	function drawResult (target, data) {
-	var $target = document.querySelector(target);
-	var html = $target.innerHTML = '';
-	for (var i = 0, len = data.length; i < len; i ++) {
-		html += '<div class="result-data">'+data[i]+'</div>';
-	}
-	$target.innerHTML = html;
-	}
-
-	drawResult("#sadari-start-data", app.startData);
-	drawResult("#sadari-end-data", app.endData);
-
-	var canvas = document.querySelector("#sadari-line");
-	var ySize = 40;
-	var width = canvas.width = window.innerWidth;
-	var height = canvas.height = (app.stack + 1) * ySize;
-	var part = width / app.getSize();
-
-	var ctx = canvas.getContext("2d");
-	function drawBackground () {
-		ctx.clearRect(0, 0, width, height);
-		ctx.strokeStyle = "#ddd";
-		ctx.lineWidth = 20;
-		ctx.lineCap = "square";
-
-		for (var i = 0, len = app.getSize(); i < len; i ++) {
-			ctx.beginPath();
-			ctx.moveTo((i * part) + (part / 2), 0);
-			ctx.lineTo((i * part) + (part / 2), height);
-			ctx.stroke();
-			ctx.closePath();
-		}
-		for (var i = 0, len = app.lines.length; i < len; i ++) {
-			var lineData = app.lines[i];
-			for (var j = 0, jlen = lineData.length; j < jlen; j ++) {
-				if (lineData[j] === 1) {
-					ctx.beginPath();
-					ctx.moveTo((i * part) + (part / 2), ySize * (j + 1));
-					ctx.lineTo(((i + 1) * part) + (part / 2), ySize * (j + 1));
-					ctx.stroke();
-					ctx.closePath();
-				}
-			}
-		}
-
-		ctx.lineWidth = 10;
-	}
-	// 하나만 움직여볼까
-	drawBackground();
-	var activeIndex = 0;
-
-	drawActiveAnimation(activeIndex, function nextAnimation () {
-		if (activeIndex !== app.getSize() - 1) {
-			drawActiveAnimation(++activeIndex, nextAnimation);
-		}
-	});
-
-
-
-	function drawActiveAnimation (index, callback) {
-		var moveData = app.move(index);
-		var animationStack = [];
-		ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
-		for (var i = 0, len = moveData.length; i < len; i ++) {
-			!function () {
-				var data = moveData[i],
-						x = data[0],
-						y = data[1],
-						value = data[2];
-				// 가로인가 세로인가
-				if (value === 0) { // 세로
-					animationStack.push(function (progress) {
-						//drawBackground();
-						ctx.beginPath();
-						if (y === 0) {
-							ctx.moveTo((x * part) + (part / 2), 0);
-							ctx.lineTo((x * part) + (part / 2), (progress * ySize));
-						} else {
-							ctx.moveTo((x * part) + (part / 2), ((y - 1) * (ySize)));
-							ctx.lineTo((x * part) + (part / 2), (((y - 1)) * (ySize)) + (ySize * progress));
-						}
-						ctx.stroke();
-						ctx.closePath();
-					});
-				} else { // 가로
-					var prevData = moveData[i - 1];
-					var direction = prevData[0] > x ? -1 : 1;
-					animationStack.push(function (progress) {
-						//drawBackground();
-						ctx.beginPath();
-						ctx.moveTo((prevData[0] * part) + (part / 2), ((y) * (ySize)));
-						ctx.lineTo((prevData[0] * part) + (part / 2) + (progress * part * direction), ((y) * (ySize)));
-						ctx.stroke();
-						ctx.closePath();
-					});
-				}
-			}();
-		}
-		asyncCall(animationStack, callback);
-	}
-
-	function asyncCall (stack, end) {
-		var index = 0;
-		function calling () {
-			var starttime;
-			requestAnimationFrame(function animationFrame (timestamp) {
-				if (!starttime) {
-					starttime = timestamp;
-				}
-				var progress = (timestamp - starttime) / 100;
-				stack[index](progress > 1 ? 1 : progress);
-				if (progress < 1) {
-					requestAnimationFrame(animationFrame);
-				} else {
-					++index;
-					if (index === stack.length) {
-						end && end();
-					} else {
-						calling();
-					}
-				}
-			});
-		}
-		calling();
-	}
-	*/
-}();
+}(window, window.document);
