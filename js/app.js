@@ -6,11 +6,10 @@
 		const sadariCanvas = new SimpleCanvas(sadariView.getCanvas());
 		let sadariApp, sadariMaker;
 
-
 		const openApp = ({startData = [], endData = [], hideMiddle = false, showDirect = false}) => {
-			//try {
+			try {
 				sadariApp = new Sadari(startData, endData);
-				sadariMaker = new SadariMaker(sadariApp, sadariCanvas, sadariView);
+				window.sadariMaker = sadariMaker = new SadariMaker(sadariApp, sadariCanvas, sadariView);
 				if ( hideMiddle === true ) {
 					sadariView.showResultHider();
 				}
@@ -22,10 +21,10 @@
 				} else {
 					sadariMaker.showAnimation();
 				}
-			//} catch (e) {
-			//	alert(e.message);
+			} catch (e) {
+				alert(e.message);
 			//	throw e;
-			//}
+			}
 		};
 
 		sadariView.getForm().addEventListener("submit", (event) => {
@@ -54,7 +53,7 @@
 					switch (event.type) {
 						case "mouseover":
 							startData.style.backgroundColor =
-							endData.style.backgroundColor = String(sadariMaker.colorStorage.get(target.infoData.startIndex));
+							endData.style.backgroundColor = String(sadariMaker.colorGenerator.get(target.infoData.startIndex));
 							startData.classList.add("__hover");
 							endData.classList.add("__hover");
 							break;

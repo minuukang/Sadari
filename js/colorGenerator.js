@@ -1,72 +1,130 @@
 !function () {
 
-	function getRandomNumber (n, min) {
-		return Math.floor(Math.random() * n) + (min || 0);
+	function getRandomNumber (max) {
+		return window.parseInt(Math.random() * max);
 	}
 
-	function ColorGenerator (n1, n2, n3) {
-		var color = [];
-		color[color.length] = getRandomNumber(n1[0], n1[1]);
-		color[color.length] = getRandomNumber(n2[0], n2[1]);
-		color[color.length] = getRandomNumber(n3[0], n3[1]);
-		color = color.sort(function () {
-			return .5 - Math.random();
-		});
-		this.push(color[0]);
-		this.push(color[1]);
-		this.push(color[2]);
+	function HSVColor (h, s, v) {
+		this.h = h;
+		this.s = s;
+		this.v = v;
 	}
 
-	ColorGenerator.prototype.push = Array.prototype.push;
-	ColorGenerator.prototype.join = Array.prototype.join;
-	ColorGenerator.prototype.toString = function () {
-		return "rgb("+this.join(",")+")";
+	HSVColor.prototype.toRGB = function () {
+		var r, g, b;
+		var i;
+		var f, p, q, t;
+
+		// Make sure our arguments stay in-range
+		var h = Math.max(0, Math.min(360, this.h));
+		var s = Math.max(0, Math.min(100, this.s));
+		var v = Math.max(0, Math.min(100, this.v));
+
+		// We accept saturation and value arguments from 0 to 100 because that's
+		// how Photoshop represents those values. Internally, however, the
+		// saturation and value are calculated from a range of 0 to 1. We make
+		// That conversion here.
+		s /= 100;
+		v /= 100;
+
+		if(s === 0) {
+			// Achromatic (grey)
+			r = g = b = v;
+			return {r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255)};
+		}
+
+		h /= 60; // sector 0 to 5
+		i = Math.floor(h);
+		f = h - i; // factorial part of h
+		p = v * (1 - s);
+		q = v * (1 - s * f);
+		t = v * (1 - s * (1 - f));
+
+		switch(i) {
+			case 0:
+				r = v;
+				g = t;
+				b = p;
+				break;
+
+			case 1:
+				r = q;
+				g = v;
+				b = p;
+				break;
+
+			case 2:
+				r = p;
+				g = v;
+				b = t;
+				break;
+
+			case 3:
+				r = p;
+				g = q;
+				b = v;
+				break;
+
+			case 4:
+				r = t;
+				g = p;
+				b = v;
+				break;
+
+			default: // case 5:
+				r = v;
+				g = p;
+				b = q;
+		}
+
+		return {r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255)};
 	};
 
-	class ColorStorage {
-		constructor () {
-			this.data = [];
-		}
-		create (n1, n2, n3) {
-			var g = null, max = 100000;
-			do {
-				g = new ColorGenerator(n1, n2, n3);
-				if ( ! this.approach(g)) {
-					break;
-				} else {
-					g = null;
-				}
-			} while(--max);
-			if (g === null) {
-				//console.log(colorStorage);
-				throw new Error("더 이상 조합할 컬러가 없습니다.");
-			}
-			this.data.push(g);
-			return g;
-		}
-		approach (g) {
-			for (var i = 0, len = this.data.length; i < len; i ++) {
-				var count = 0;
-				for (var j = 0; j < 3; j ++) {
-					if (this.data[i][j] - 30 <= g[j] && g[j] <= this.data[i][j] + 30) {
-						count ++;
-					}
-				}
-				if (count > 2) {
-					return true;
-				}
-			}
-			return false;
-		}
-		get (index) {
-			return this.data[index];
-		}
-		reset () {
-			this.data.length = 0;
-		}
+	HSVColor.prototype.toString = function () {
+		var rgb = this.toRGB();
+		return "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
+	};
+
+	function ColorGenerator () {
+		this.data = [];
 	}
 
-	window.ColorStorage = ColorStorage;
+	ColorGenerator.prototype.abs = function (n) {
+		//return n > 360 ? n - 360 : (n < 0 ? n + 360 : n);
+		return n;
+	}
+
+	ColorGenerator.prototype.like = function ( oHSVColor ) {
+		for (var i = 0, len = this.data.length; i < len; i ++) {
+			if (
+				(this.abs(this.data[i].h - 30) < oHSVColor.h && oHSVColor.h < this.abs(this.data[i].h + 30)) &&
+				(this.data[i].s - 30 < oHSVColor.s && oHSVColor.s < this.data[i].s + 30) &&
+				(this.data[i].v - 15 < oHSVColor.v && oHSVColor.v < this.data[i].v + 15)
+			) {
+				return true;
+			}
+		}
+		return false;
+	};
+
+	ColorGenerator.prototype.get = function (index) {
+		return this.data[index];
+	};
+
+	ColorGenerator.prototype.create = function (minSaruation, minValue) {
+		var color, i = 10000;
+		do {
+			color = new HSVColor(getRandomNumber(360), 70 - getRandomNumber(minSaruation), 100 - getRandomNumber(minValue));
+		} while (this.like(color) && --i > 0);
+		if (i < 1) {
+			throw new Error("duplicate color max");
+		}
+		this.data.push(color);
+		return color;
+	};
+
+	//return ColorGenerator;
+	window.ColorGenerator = ColorGenerator;
 
 
 }();

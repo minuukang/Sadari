@@ -6,13 +6,13 @@
 			this.appSadari = appSadari;
 			this.appView = appView;
 			this.aniCtrl = new AnimationController;
-			this.colorStorage = new ColorStorage;
+			this.colorGenerator = new ColorGenerator;
 			this.reset();
 		}
 		reset () {
 			this.aniCtrl.clear();
 			this.moveData = [];
-			this.colorStorage.reset();
+			this.colorGenerator = new ColorGenerator;
 		}
 		chainMoveData (moveData) {
 			let activeIndex = this.moveData.length;
@@ -47,7 +47,7 @@
 				//let prevData = index && allData[index - 1];
 				//this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
 				//this.appCanvas.setOption("strokeStyle", this.getColor(index));
-				const color = this.colorStorage.create([125, 55], [75, 105], [55, 155]);
+				const color = this.colorGenerator.create(30, 30);
 				this.appCanvas.setOption("strokeStyle", color.toString());
 				moveData.forEach((data, index, allData) => {
 					this.drawLineFromMoveData(data, index ? allData[index - 1][0] : -1, 1);
@@ -82,7 +82,7 @@
 			//var animationStack = [];
 			//ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
 			//this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
-			const color = this.colorStorage.create([125, 55], [75, 105], [55, 155]);
+			const color = this.colorGenerator.create(30, 30);
 			this.appCanvas.setOption("strokeStyle", color.toString());
 			for (let i = 0, len = moveData.length; i < len; i ++) {
 				this.aniCtrl.push((() => {
