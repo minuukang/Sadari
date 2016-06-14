@@ -6,13 +6,17 @@
 			this.appSadari = appSadari;
 			this.appView = appView;
 			this.aniCtrl = new AnimationController;
-			this.colorGenerator = new ColorGenerator;
+			//this.colorGenerator = new ColorGenerator();
 			this.reset();
 		}
 		reset () {
 			this.aniCtrl.clear();
 			this.moveData = [];
-			this.colorGenerator = new ColorGenerator;
+			this.colorGenerator = new ColorGenerator({
+				h: [0, 360],
+				s: [35, 75],
+				v: [60, 100]
+			});
 		}
 		chainMoveData (moveData) {
 			let activeIndex = this.moveData.length;
@@ -47,7 +51,7 @@
 				//let prevData = index && allData[index - 1];
 				//this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
 				//this.appCanvas.setOption("strokeStyle", this.getColor(index));
-				const color = this.colorGenerator.create(30, 30);
+				const color = this.colorGenerator.create(this.colorCheck);
 				this.appCanvas.setOption("strokeStyle", color.toString());
 				moveData.forEach((data, index, allData) => {
 					this.drawLineFromMoveData(data, index ? allData[index - 1][0] : -1, 1);
@@ -76,13 +80,23 @@
 			this.drawBackground();
 			this.drawActiveAnimation(activeIndex, nextAnimation);
 		}
+		colorCheck (hsv, collect) {
+			for (var i = 0, len = collect.size(); len && i < 5; i ++) {
+				var color = collect.get(len - 1 - i);
+				if (color && color.h - 30 < hsv.h && hsv.h < color.h + 30) {
+					//throw ([color, hsv]);
+					return true;
+				}
+			}
+			return false;
+		}
 		drawActiveAnimation (index, callback) {
 			this.chainMoveData(this.appSadari.move(index));
 			const moveData = this.moveData[index];
 			//var animationStack = [];
 			//ctx.strokeStyle = generateRandomColor([125, 55], [125, 55], [125, 55]);
 			//this.setColor(index, generateRandomColor([125, 55], [125, 55], [125, 55]));
-			const color = this.colorGenerator.create(30, 30);
+			const color = this.colorGenerator.create(this.colorCheck);
 			this.appCanvas.setOption("strokeStyle", color.toString());
 			for (let i = 0, len = moveData.length; i < len; i ++) {
 				this.aniCtrl.push((() => {

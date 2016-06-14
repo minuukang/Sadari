@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Color Test</title>
+	<script src="./js/colorGenerator.js"></script>
+	<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var collection = new ColorGenerator({
+			h: [0, 360],
+			s: [35, 75],
+			v: [60, 100]
+		});
+		var html = document.createDocumentFragment();
+		function colorCheck (hsv, collect) {
+			for (var i = 0, len = collect.size(); len && i < 5; i ++) {
+				var color = collect.get(len - 1 - i);
+				if (color && color.h - 30 < hsv.h && hsv.h < color.h + 30) {
+					//throw ([color, hsv]);
+					return true;
+				}
+			}
+			return false;
+		}
+		try {
+			var i = 100;
+			while (--i) {
+				var color = collection.create(colorCheck);
+				var item = document.createElement('DIV');
+				item.classList.add('color-item');
+				item.innerHTML = "hsv : " + (JSON.stringify(color)) + " / rgb : " + color.toString();
+				item.style.backgroundColor = color.toString();
+				html.appendChild(item);
+			}
+			throw i;
+		} catch (e) {
+			console.log(e);
+			console.log(html.childNodes.length + " Colors complete");
+			document.body.appendChild(html);
+		}
+	});
+	</script>
+	<style>
+		.color-item {
+			width: 100%;
+			padding: 20px;
+			-webkit-box-sizing: border-box;
+			-moz-box-sizing: border-box;
+			box-sizing: border-box;
+			background-color: transparent;
+			color: #000;
+			font-weight: bold;
+			text-shadow: 0 0 3px #fff;
+		}
+	</style>
+</head>
+<body>
+
+</body>
+</html>

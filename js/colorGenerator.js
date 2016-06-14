@@ -85,8 +85,13 @@
 		return "rgb("+rgb.r+","+rgb.g+","+rgb.b+")";
 	};
 
-	function ColorGenerator () {
+	function ColorGenerator (initSetting) {
 		this.data = [];
+		this.init = initSetting || {
+			h: [0, 360],
+			s: [0, 100],
+			v: [0, 100]
+		};
 	}
 
 	ColorGenerator.prototype.abs = function (n) {
@@ -97,9 +102,11 @@
 	ColorGenerator.prototype.like = function ( oHSVColor ) {
 		for (var i = 0, len = this.data.length; i < len; i ++) {
 			if (
-				(this.abs(this.data[i].h - 30) < oHSVColor.h && oHSVColor.h < this.abs(this.data[i].h + 30)) &&
-				(this.data[i].s - 30 < oHSVColor.s && oHSVColor.s < this.data[i].s + 30) &&
-				(this.data[i].v - 15 < oHSVColor.v && oHSVColor.v < this.data[i].v + 15)
+				(this.abs(this.data[i].h - 15) <= oHSVColor.h && oHSVColor.h <= this.abs(this.data[i].h + 15)) &&
+				(
+					(this.data[i].s - 30 < oHSVColor.s && oHSVColor.s < this.data[i].s + 30) &&
+					(this.data[i].v - 15 < oHSVColor.v && oHSVColor.v < this.data[i].v + 15)
+				)
 			) {
 				return true;
 			}
@@ -107,15 +114,24 @@
 		return false;
 	};
 
+
 	ColorGenerator.prototype.get = function (index) {
 		return this.data[index];
 	};
 
-	ColorGenerator.prototype.create = function (minSaruation, minValue) {
-		var color, i = 10000;
+	ColorGenerator.prototype.size = function () {
+		return this.data.length;
+	}
+
+	ColorGenerator.prototype.create = function (callback) {
+		var color, i = 100;
 		do {
-			color = new HSVColor(getRandomNumber(360), 70 - getRandomNumber(minSaruation), 100 - getRandomNumber(minValue));
-		} while (this.like(color) && --i > 0);
+			color = new HSVColor(
+				this.init.h[0] + getRandomNumber(this.init.h[1] - this.init.h[0]),
+				this.init.s[0] + getRandomNumber(this.init.v[1] - this.init.s[0]),
+				this.init.v[0] + getRandomNumber(this.init.v[1] - this.init.v[0])
+			);
+		} while (--i > 0 && (callback && callback(color, this)));
 		if (i < 1) {
 			throw new Error("duplicate color max");
 		}
